@@ -12,8 +12,8 @@ except ImportError:
 from scipy.spatial import cKDTree as KDTree
 
 # location of geocode data to download
-GEOCODE_URL = 'http://download.geonames.org/export/dump/cities1000.zip'
-GEOCODE_FILENAME = 'cities1000.txt'
+GEOCODE_URL = 'http://download.geonames.org/export/dump/cities15000.zip'
+GEOCODE_FILENAME = 'cities15000.txt'
 
 
 def singleton(cls):
@@ -87,8 +87,9 @@ class GeocodeData:
             rows = []
             for row in csv.reader(open(GEOCODE_FILENAME, 'r'), delimiter='\t'):
                 latitude, longitude = row[4:6]
+                feature_code = row[7]
                 country_code = row[8]
-                if latitude and longitude and country_code:
+                if latitude and longitude and country_code == "RU" and feature_code.startswith("PPLA"):
                     city = row[1]
                     row = latitude, longitude, country_code, city
                     writer.writerow(row)
