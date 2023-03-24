@@ -66,6 +66,13 @@ class GeocodeData:
             logging.info('Downloading: {}'.format(GEOCODE_URL))
             urlretrieve(GEOCODE_URL, local_filename)
         return local_filename
+    
+    @staticmethod
+    def _is_city_larger_than_100k(feature_code, country_code, population):
+        return country_code == "RU" and (
+            (feature_code=="PPLA" or feature_code=="PPLC") or (feature_code=="PPL" and int(population) > 100_000)
+            )
+
 
     def __extract(self, local_filename):
         """Extract geocode data from zip
@@ -89,7 +96,8 @@ class GeocodeData:
                 latitude, longitude = row[4:6]
                 feature_code = row[7]
                 country_code = row[8]
-                if latitude and longitude and country_code == "RU" and feature_code.startswith("PPLA"):
+                population = row[14]
+                if latitude and longitude and self._is_city_larger_than_100k(feature_code, country_code, population):
                     city = row[1]
                     row = latitude, longitude, country_code, city
                     writer.writerow(row)
